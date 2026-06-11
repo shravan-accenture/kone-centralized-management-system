@@ -4,15 +4,22 @@ import UploadPage from './pages/UploadPage';
 // Main application shell with the shared header and upload workspace.
 function App() {
   return (
-    <>
-      <nav className="navbar navbar-dark bg-dark">
-        <div className="container">
-          <span className="navbar-brand">KONE Centralized Management System</span>
-        </div>
-      </nav>
+    <div className="app-shell">
+      <header className="app-header">
+        <div className="app-header-inner">
+          <div>
+            <img src="/kone-logo.png" alt="KONE" className="brand-logo" />
+            <h1 className="app-title">Centralized Management System</h1>
+          </div>
 
-      <UploadPage />
-    </>
+          <div className="header-badge">Upload workspace</div>
+        </div>
+      </header>
+
+      <main className="app-main">
+        <UploadPage />
+      </main>
+    </div>
   );
 }
 

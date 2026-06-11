@@ -3,6 +3,10 @@ import globals from 'globals';
 import pluginReact from 'eslint-plugin-react';
 
 export default [
+  {
+    ignores: ['dist/**'],
+  },
+
   js.configs.recommended,
 
   {

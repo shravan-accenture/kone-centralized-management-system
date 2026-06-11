@@ -4,10 +4,14 @@ import axios from 'axios';
 function UploadPage() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [products, setProducts] = useState([]);
+  const [status, setStatus] = useState('idle');
+  const [message, setMessage] = useState('');
 
   // Keep the selected spreadsheet in component state until the user uploads it.
   const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
+    setSelectedFile(event.target.files[0] || null);
+    setMessage('');
+    setStatus('idle');
   };
 
   // Send the selected file to the backend and display the imported product rows.
@@ -17,70 +21,121 @@ function UploadPage() {
     const formData = new FormData();
 
     formData.append('file', selectedFile);
+    setStatus('uploading');
+    setMessage('Uploading and importing spreadsheet data...');
 
     try {
       const response = await axios.post('http://localhost:5000/api/files/upload', formData);
 
-      setProducts(response.data.products);
-
-      alert('File uploaded successfully');
+      setProducts(response.data.products || []);
+      setStatus('success');
+      setMessage('File uploaded successfully. Product rows are ready for review.');
     } catch (error) {
       console.error(error);
-      alert('Upload failed');
+      setStatus('error');
+      setMessage('Upload failed. Please check the backend server and spreadsheet format.');
     }
   };
 
+  const getStatusClassName = () => {
+    if (status === 'error') return 'status-message status-message-error';
+    if (status === 'success') return 'status-message status-message-success';
+
+    return 'status-message status-message-info';
+  };
+
   return (
-    <div className="container mt-5">
-      <div className="card shadow-sm">
-        <div className="card-header">
-          <h3>Upload File</h3>
+    <section className="upload-layout">
+      <div className="upload-card">
+        <div>
+          <p className="section-label">Spreadsheet import</p>
+          <h2 className="section-title">Upload product data</h2>
+          <p className="section-copy">
+            Select an Excel file with product ID, product name, price, and region columns.
+          </p>
         </div>
 
-        <div className="card-body">
-          <input type="file" className="form-control" onChange={handleFileChange} />
+        <label htmlFor="product-file" className="file-dropzone">
+          <span className="file-dropzone-icon">+</span>
+          <span className="file-dropzone-title">Choose spreadsheet</span>
+          <span className="file-dropzone-help">XLSX, XLS, or CSV product files</span>
+          <input
+            id="product-file"
+            type="file"
+            accept=".xlsx,.xls,.csv"
+            className="sr-only"
+            onChange={handleFileChange}
+          />
+        </label>
 
-          {selectedFile && (
-            <div className="mt-3">
-              <strong>Selected File:</strong>
-              <p>{selectedFile.name}</p>
-            </div>
-          )}
+        {selectedFile && (
+          <div className="selected-file">
+            <p className="selected-file-label">Selected file</p>
+            <p className="selected-file-name">{selectedFile.name}</p>
+            <p className="selected-file-size">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+          </div>
+        )}
 
-          <button className="btn btn-primary mt-3" disabled={!selectedFile} onClick={handleUpload}>
-            Upload
-          </button>
-          {products.length > 0 && (
-            <div className="mt-6 overflow-x-auto">
-              <table className="min-w-full border border-gray-300">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border px-4 py-2">Product ID</th>
-                    <th className="border px-4 py-2">Product Name</th>
-                    <th className="border px-4 py-2">Price</th>
-                    <th className="border px-4 py-2">Region</th>
-                  </tr>
-                </thead>
+        {message && <div className={getStatusClassName()}>{message}</div>}
 
-                <tbody>
-                  {products.map((product, index) => (
-                    <tr key={index}>
-                      <td className="border px-4 py-2">{product['Product ID']}</td>
-
-                      <td className="border px-4 py-2">{product['Product Name']}</td>
-
-                      <td className="border px-4 py-2">{product['Price']}</td>
-
-                      <td className="border px-4 py-2">{product['Region']}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        <button
+          className="upload-button"
+          disabled={!selectedFile || status === 'uploading'}
+          onClick={handleUpload}
+        >
+          {status === 'uploading' ? 'Uploading...' : 'Upload file'}
+        </button>
       </div>
-    </div>
+
+      <div className="panel">
+        <div className="table-panel-header">
+          <div>
+            <p className="table-label">Imported products</p>
+            <h2 className="table-title">Preview table</h2>
+          </div>
+
+          <div className="row-count">{products.length} rows</div>
+        </div>
+
+        {products.length > 0 ? (
+          <div className="table-scroll">
+            <table className="products-table">
+              <thead className="products-table-head">
+                <tr>
+                  <th className="products-table-heading">Product ID</th>
+                  <th className="products-table-heading">Product Name</th>
+                  <th className="products-table-heading">Price</th>
+                  <th className="products-table-heading">Region</th>
+                </tr>
+              </thead>
+
+              <tbody className="products-table-body">
+                {products.map((product, index) => (
+                  <tr key={`${product['Product ID'] || 'product'}-${index}`} className="products-table-row">
+                    <td className="products-table-id">{product['Product ID']}</td>
+                    <td className="products-table-cell">{product['Product Name']}</td>
+                    <td className="products-table-value">{product['Price']}</td>
+                    <td className="products-table-value">
+                      <span className="region-pill">{product['Region']}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="empty-state">
+            <div>
+              <div className="empty-state-icon">#</div>
+              <h3 className="empty-state-title">No rows imported yet</h3>
+              <p className="empty-state-copy">
+                Upload a product spreadsheet to preview imported rows here.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
