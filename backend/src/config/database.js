@@ -1,5 +1,6 @@
 const sqlite3 = require("sqlite3").verbose();
 
+// Local SQLite database used by the proof-of-concept backend.
 const db = new sqlite3.Database("./database/app.db", (err) => {
   if (err) {
     console.error(err.message);
@@ -8,6 +9,7 @@ const db = new sqlite3.Database("./database/app.db", (err) => {
   }
 });
 
+// Stores each uploaded file so the app can track upload history and metadata.
 db.run(`
 CREATE TABLE IF NOT EXISTS files (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -19,6 +21,7 @@ CREATE TABLE IF NOT EXISTS files (
 )
 `);
 
+// Stores product rows parsed from uploaded spreadsheets.
 db.run(`
 CREATE TABLE IF NOT EXISTS products (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
