@@ -1,16 +1,20 @@
-
 import React, { useEffect } from "react";
-
+import UploadPage from "./pages/UploadPage";
 
 function App() {
-  useEffect(() => {
-    fetch("http://localhost:5000/health")
-      .then((res) => res.json())
-      .then((data) => console.log(data))
-      .catch(console.error);
-  }, []);
+  return (
+    <>
+      <nav className="navbar navbar-dark bg-dark">
+        <div className="container">
+          <span className="navbar-brand">
+            KONE Centralized Management System
+          </span>
+        </div>
+      </nav>
 
-  return <h1>KONE Centralized Management System</h1>;
+      <UploadPage />
+    </>
+  );
 }
 
 export default App;
