@@ -4,16 +4,7 @@ const { uploadFile } = require('../controllers/fileController');
 
 const router = express.Router();
 
-// Multer writes uploaded files to the local uploads folder with a timestamped name.
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  },
-});
+const storage = multer.memoryStorage();
 
 const upload = multer({ storage });
 

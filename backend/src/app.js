@@ -1,10 +1,11 @@
+const dotenv = require('dotenv');
+dotenv.config();
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
+
 const fileRoutes = require('./routes/fileRoutes');
 
 const app = express();
-dotenv.config();
 
 // Global middleware used by every API route.
 app.use(cors());
@@ -12,8 +13,6 @@ app.use(express.json());
 
 // File upload and spreadsheet import endpoints.
 app.use('/api/files', fileRoutes);
-app.use(cors());
-app.use(express.json());
 
 // Simple endpoint for confirming that the API process is running.
 app.get('/health', (req, res) => {
