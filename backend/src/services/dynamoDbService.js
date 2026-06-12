@@ -1,10 +1,10 @@
 const { PutCommand } = require('@aws-sdk/lib-dynamodb');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 const dynamoDb = require('../config/dynamoDb');
 
 const saveFileMetadata = async (file, s3File) => {
   const item = {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     originalName: file.originalname,
     s3Key: s3File.key,
     bucket: s3File.bucket,
