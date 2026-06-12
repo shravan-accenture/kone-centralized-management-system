@@ -25,7 +25,7 @@ function UploadPage() {
     setMessage('Uploading and importing spreadsheet data...');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/files/upload', formData);
+      const response = await axios.post('http://13.233.146.247:5000/api/files/upload', formData);
 
       setProducts(response.data.products || []);
       setStatus('success');
@@ -111,7 +111,10 @@ function UploadPage() {
 
               <tbody className="products-table-body">
                 {products.map((product, index) => (
-                  <tr key={`${product['Product ID'] || 'product'}-${index}`} className="products-table-row">
+                  <tr
+                    key={`${product['Product ID'] || 'product'}-${index}`}
+                    className="products-table-row"
+                  >
                     <td className="products-table-id">{product['Product ID']}</td>
                     <td className="products-table-cell">{product['Product Name']}</td>
                     <td className="products-table-value">{product['Price']}</td>
